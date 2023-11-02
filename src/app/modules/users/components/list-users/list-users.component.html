@@ -1,3 +1,44 @@
-<p>
-  list-users works!
-</p>
+<div class="container mt-3">
+  <div class="row">
+    <div class="col-3" *ngFor="let user of users">
+      <mat-card class="example-card">
+        <mat-card-header>
+          <mat-card-title>{{ user.name }}</mat-card-title>
+          <mat-card-subtitle>{{ user.profession }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>
+            Data Nasc.: <strong>{{ user.birthDate }}</strong>
+          </p>
+          <p>
+            CPF: <strong>{{ user.documentNumber }}</strong>
+          </p>
+          <p>
+            E-mail: <strong>{{ user.email }}</strong>
+          </p>
+          <p>
+            Telefone:
+            <strong>{{ user.phone | mask : "(00) 0 0000-0000" }}</strong>
+          </p>
+          <p>
+            Renda mensal: <strong>{{ user.income }}</strong>
+          </p>
+          <p>
+            Endereço:
+            <strong
+              >{{ user.address.street }}, nº {{ user.address.number }},
+              {{ user.address.complement ?? "" }}
+              {{ user.address.zipCode | mask : "00.000-000" }}.
+              {{ user.address.neighborhood }}, {{ user.address.city }} -
+              {{ user.address.state }}</strong
+            >
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button>LIKE</button>
+          <button mat-button>SHARE</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>
