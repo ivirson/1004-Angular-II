@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { UsersService } from 'src/app/modules/users/services/users.service';
 
 @Component({
   selector: 'app-header',

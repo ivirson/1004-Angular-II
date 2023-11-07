@@ -23,6 +23,10 @@ const routes: Routes = [
         path: 'create',
         component: CreateUserComponent,
       },
+      {
+        path: 'edit/:id',
+        component: CreateUserComponent,
+      },
     ],
   },
   {

@@ -1,4 +1,14 @@
 <div class="container mt-3">
+  <div class="d-flex justify-content-end">
+    <button
+      mat-fab
+      color="primary"
+      matTooltip="Adicionar Usuário"
+      routerLink="/users/create"
+    >
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
   <div class="row">
     <div class="col-3" *ngFor="let user of users">
       <mat-card class="example-card">
@@ -11,7 +21,8 @@
             Data Nasc.: <strong>{{ user.birthDate }}</strong>
           </p>
           <p>
-            CPF: <strong>{{ user.documentNumber }}</strong>
+            CPF:
+            <strong>{{ user.documentNumber | mask : "000.000.000-00" }}</strong>
           </p>
           <p>
             E-mail: <strong>{{ user.email }}</strong>
@@ -21,7 +32,8 @@
             <strong>{{ user.phone | mask : "(00) 0 0000-0000" }}</strong>
           </p>
           <p>
-            Renda mensal: <strong>{{ user.income }}</strong>
+            Renda mensal:
+            <strong>{{ user.income | currency : "BRL" }}</strong>
           </p>
           <p>
             Endereço:
