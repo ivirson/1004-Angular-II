@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/user.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { AddressDto } from '../models/address.dto';
 
 @Injectable({
   providedIn: 'root',
@@ -27,7 +30,7 @@ export class UsersService {
     },
   ];
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   public getUsers(): User[] {
     return this.users;
@@ -39,5 +42,11 @@ export class UsersService {
 
   public getById(id: string): User | undefined {
     return this.users.find((user) => user.id === id);
+  }
+
+  public getAddressByZipCode(zipCode: string): Observable<AddressDto> {
+    return this.http.get<AddressDto>(
+      `https://viacep.com.br/ws/${zipCode}/json/`
+    );
   }
 }

@@ -1,15 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { AddressDto } from './../../models/address.dto';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { UsersService } from '../../services/users.service';
 import { Router } from '@angular/router';
 import { User } from '../../models/user.model';
+import { Address } from '../../models/address.model';
+import { BehaviorSubject, first, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-create-user',
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.scss'],
 })
-export class CreateUserComponent implements OnInit {
+export class CreateUserComponent implements OnInit, OnDestroy {
+  private ngUnsubscribe = new BehaviorSubject<boolean>(true);
   public userForm!: FormGroup;
 
   constructor(private usersService: UsersService, private router: Router) {}
@@ -17,6 +21,7 @@ export class CreateUserComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.setFormData();
+    this.setZipCodeSubscription();
   }
 
   private buildForm(): void {
@@ -64,9 +69,47 @@ export class CreateUserComponent implements OnInit {
     this.userForm.patchValue(newUser);
   }
 
+  private setZipCodeSubscription(): void {
+    this.userForm
+      .get('address')
+      ?.get('zipCode')
+      ?.valueChanges.subscribe({
+        next: (zipCode: string) => {
+          if (zipCode.length === 8) {
+            this.getAddressByZipCode(zipCode);
+          }
+        },
+      });
+  }
+
+  private getAddressByZipCode(zipCode: string): void {
+    this.usersService.getAddressByZipCode(zipCode).subscribe({
+      next: (res: AddressDto) => {
+        console.log(res);
+        const address: Address = {
+          zipCode: res.cep,
+          street: res.logradouro,
+          complement: res.complemento,
+          neighborhood: res.bairro,
+          city: res.localidade,
+          state: res.uf,
+        };
+        this.userForm.get('address')?.patchValue(address);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+    });
+  }
+
   public onSave(): void {
     console.log(this.userForm);
     this.usersService.createUser(this.userForm.getRawValue());
     this.router.navigate(['/users']);
+  }
+
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next(true);
+    this.ngUnsubscribe.complete();
   }
 }
