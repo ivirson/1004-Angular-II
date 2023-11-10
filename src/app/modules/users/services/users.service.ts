@@ -8,40 +8,19 @@ import { AddressDto } from '../models/address.dto';
   providedIn: 'root',
 })
 export class UsersService {
-  private users: User[] = [
-    {
-      id: crypto.randomUUID(),
-      name: 'Ivirson Daltro',
-      profession: 'Dev',
-      birthDate: '01/01/2000',
-      documentNumber: '01234567890',
-      email: 'ivirson@email.com',
-      password: 'SenhaForte@123',
-      phone: '71989898989',
-      income: 1000,
-      address: {
-        zipCode: '42800040',
-        street: 'Rua Costa Pinto',
-        number: 200,
-        neighborhood: 'Centro',
-        city: 'Camaçari',
-        state: 'BA',
-      },
-    },
-  ];
-
+  private apiBaseUrl = 'http://localhost:5000/users';
   constructor(private http: HttpClient) {}
 
-  public getUsers(): User[] {
-    return this.users;
+  public getUsers(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiBaseUrl);
   }
 
   public createUser(user: User): void {
-    this.users.push({ ...user, id: crypto.randomUUID() });
+    // this.users.push({ ...user, id: crypto.randomUUID() });
   }
 
-  public getById(id: string): User | undefined {
-    return this.users.find((user) => user.id === id);
+  public getById(id: string) {
+    return {}; //this.users.find((user) => user.id === id);
   }
 
   public getAddressByZipCode(zipCode: string): Observable<AddressDto> {

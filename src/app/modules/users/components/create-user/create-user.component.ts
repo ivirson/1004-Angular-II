@@ -116,7 +116,7 @@ export class CreateUserComponent implements OnInit, OnDestroy {
       ?.get('zipCode')
       ?.valueChanges.pipe(
         takeUntil(this.ngUnsubscribe),
-        debounceTime(2000),
+        debounceTime(1000),
         distinctUntilChanged(
           (prev, next) => JSON.stringify(prev) === JSON.stringify(next)
         ),
