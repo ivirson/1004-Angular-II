@@ -15,12 +15,16 @@ export class UsersService {
     return this.http.get<User[]>(this.apiBaseUrl);
   }
 
-  public createUser(user: User): void {
-    // this.users.push({ ...user, id: crypto.randomUUID() });
+  public getById(id: string): Observable<User> {
+    return this.http.get<User>(`${this.apiBaseUrl}/${id}`);
   }
 
-  public getById(id: string) {
-    return {}; //this.users.find((user) => user.id === id);
+  public createUser(user: User): Observable<void> {
+    return this.http.post<void>(this.apiBaseUrl, user);
+  }
+
+  public edit(user: User): Observable<void> {
+    return this.http.put<void>(`${this.apiBaseUrl}/${user.id}`, user);
   }
 
   public getAddressByZipCode(zipCode: string): Observable<AddressDto> {

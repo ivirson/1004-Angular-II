@@ -5,13 +5,14 @@ import {
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   Observable,
   Subject,
   debounceTime,
   distinctUntilChanged,
   filter,
+  first,
   takeUntil,
 } from 'rxjs';
 import { Address } from '../../models/address.model';
@@ -26,6 +27,7 @@ import { AddressDto } from './../../models/address.dto';
 })
 export class CreateUserComponent implements OnInit, OnDestroy {
   private ngUnsubscribe = new Subject();
+  private userId?: string;
   public userForm!: FormGroup;
 
   public obs = new Observable((observer) => {
@@ -36,31 +38,44 @@ export class CreateUserComponent implements OnInit, OnDestroy {
     }, 2000);
   });
 
-  constructor(private usersService: UsersService, private router: Router) {}
+  constructor(
+    private usersService: UsersService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     this.buildForm();
-    this.setFormData();
+    this.getIdFromUrl();
+    // this.setFormData();
     this.setZipCodeSubscription();
-    this.obs.pipe(takeUntil(this.ngUnsubscribe)).subscribe({
-      next(value) {
-        console.log(value);
-      },
-      error(err) {
-        console.log(err);
-      },
-      complete() {
-        console.log('COMPLETE');
-      },
-    });
+    // this.obs.pipe(takeUntil(this.ngUnsubscribe)).subscribe({
+    //   next(value) {
+    //     console.log(value);
+    //   },
+    //   error(err) {
+    //     console.log(err);
+    //   },
+    //   complete() {
+    //     console.log('COMPLETE');
+    //   },
+    // });
 
-    this.userForm.valueChanges
-      .pipe(takeUntil(this.ngUnsubscribe))
-      .subscribe((_) => console.log(this.userForm));
+    // this.userForm.valueChanges
+    //   .pipe(takeUntil(this.ngUnsubscribe))
+    //   .subscribe((_) => console.log(this.userForm));
+  }
+
+  public getIdFromUrl(): void {
+    this.userId = this.route.snapshot.params['id'];
+    if (this.userId) {
+      this.getUserById();
+    }
   }
 
   private buildForm(): void {
     this.userForm = new FormGroup({
+      id: new FormControl(),
       name: new FormControl(null, [Validators.required]),
       profession: new FormControl(),
       birthDate: new FormControl(null, [Validators.required]),
@@ -78,7 +93,7 @@ export class CreateUserComponent implements OnInit, OnDestroy {
       address: new FormGroup({
         zipCode: new FormControl(),
         street: new FormControl(),
-        number: new FormControl(),
+        number: new FormControl(null, [Validators.required]),
         complement: new FormControl(),
         neighborhood: new FormControl(),
         city: new FormControl(),
@@ -87,28 +102,42 @@ export class CreateUserComponent implements OnInit, OnDestroy {
     });
   }
 
-  private setFormData(): void {
-    const newUser: User = {
-      name: 'Clovis',
-      profession: 'Dev',
-      birthDate: '01/01/2000',
-      documentNumber: '01234567890',
-      email: 'clovis@email.com',
-      password: 'SenhaForte@123',
-      phone: '11989898989',
-      income: 1000,
-      address: {
-        zipCode: '42800040',
-        street: 'Rua da Rodoviária',
-        number: 200,
-        neighborhood: 'Centro',
-        city: 'Camaçari',
-        state: 'BA',
-      },
-    };
-
-    this.userForm.patchValue(newUser);
+  private getUserById(): void {
+    this.usersService
+      .getById(this.userId!)
+      .pipe(first())
+      .subscribe({
+        next: (res) => {
+          this.userForm.patchValue(res);
+        },
+        error: (err) => {
+          console.log(err);
+        },
+      });
   }
+
+  // private setFormData(): void {
+  //   const newUser: User = {
+  //     name: 'Clovis',
+  //     profession: 'Dev',
+  //     birthDate: '01/01/2000',
+  //     documentNumber: '01234567890',
+  //     email: 'clovis@email.com',
+  //     password: 'SenhaForte@123',
+  //     phone: '11989898989',
+  //     income: 1000,
+  //     address: {
+  //       zipCode: '42800040',
+  //       street: 'Rua da Rodoviária',
+  //       number: 200,
+  //       neighborhood: 'Centro',
+  //       city: 'Camaçari',
+  //       state: 'BA',
+  //     },
+  //   };
+
+  //   this.userForm.patchValue(newUser);
+  // }
 
   private setZipCodeSubscription(): void {
     this.userForm
@@ -152,9 +181,39 @@ export class CreateUserComponent implements OnInit, OnDestroy {
   }
 
   public onSave(): void {
-    console.log(this.userForm);
-    this.usersService.createUser(this.userForm.getRawValue());
-    this.router.navigate(['/users']);
+    if (this.userId) {
+      this.onUpdate();
+    } else {
+      this.onCreate();
+    }
+  }
+
+  public onCreate(): void {
+    this.usersService
+      .createUser(this.userForm.getRawValue())
+      .pipe(first())
+      .subscribe({
+        error: (err) => {
+          console.log(err);
+        },
+        complete: () => {
+          this.router.navigate(['/users']);
+        },
+      });
+  }
+
+  public onUpdate(): void {
+    this.usersService
+      .edit(this.userForm.getRawValue())
+      .pipe(first())
+      .subscribe({
+        error: (err) => {
+          console.log(err);
+        },
+        complete: () => {
+          this.router.navigate(['/users']);
+        },
+      });
   }
 
   private cpfValidator({ value }: AbstractControl<string>) {
