@@ -9,14 +9,20 @@ import { AddressDto } from '../models/address.dto';
 })
 export class UsersService {
   private apiBaseUrl = 'http://localhost:5000/users';
+  private token = localStorage.getItem('TOKEN');
+
   constructor(private http: HttpClient) {}
 
   public getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiBaseUrl);
+    return this.http.get<User[]>(this.apiBaseUrl, {
+      headers: { authorization: `Bearer ${this.token}` },
+    });
   }
 
   public getById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.apiBaseUrl}/${id}`);
+    return this.http.get<User>(`${this.apiBaseUrl}/${id}`, {
+      headers: { authorization: `Bearer ${this.token}` },
+    });
   }
 
   public createUser(user: User): Observable<void> {
