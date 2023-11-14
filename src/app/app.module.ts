@@ -2,7 +2,7 @@ import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { registerLocaleData } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import ptBr from '@angular/common/locales/pt';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,6 +25,8 @@ import { CreateUserComponent } from './modules/users/components/create-user/crea
 import { ListUsersComponent } from './modules/users/components/list-users/list-users.component';
 import { UsersComponent } from './modules/users/users.component';
 import { HeaderComponent } from './shared/components/header/header.component';
+import { LoginComponent } from './core/auth/components/login/login.component';
+import { RequestInterceptor } from './core/interceptors/request.interceptor';
 
 registerLocaleData(ptBr);
 
@@ -36,6 +38,7 @@ registerLocaleData(ptBr);
     CreateUserComponent,
     HeaderComponent,
     NotFoundComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
@@ -57,6 +60,7 @@ registerLocaleData(ptBr);
   providers: [
     provideEnvironmentNgxMask(),
     { provide: LOCALE_ID, useValue: 'pt' },
+    { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })

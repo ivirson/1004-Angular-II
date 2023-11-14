@@ -14,15 +14,11 @@ export class UsersService {
   constructor(private http: HttpClient) {}
 
   public getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiBaseUrl, {
-      headers: { authorization: `Bearer ${this.token}` },
-    });
+    return this.http.get<User[]>(this.apiBaseUrl);
   }
 
   public getById(id: string): Observable<User> {
-    return this.http.get<User>(`${this.apiBaseUrl}/${id}`, {
-      headers: { authorization: `Bearer ${this.token}` },
-    });
+    return this.http.get<User>(`${this.apiBaseUrl}/${id}`);
   }
 
   public createUser(user: User): Observable<void> {

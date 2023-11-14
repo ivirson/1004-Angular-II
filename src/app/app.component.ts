@@ -35,6 +35,7 @@ export class AppComponent implements OnInit {
   // });
 
   ngOnInit(): void {
+    localStorage.setItem('USER_ROLES', JSON.stringify(['ADMIN']));
     // this.obs.subscribe({
     //   next(value) {
     //     console.log(value);
