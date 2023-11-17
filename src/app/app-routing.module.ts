@@ -20,25 +20,8 @@ const routes: Routes = [
   },
   {
     path: 'users',
-    component: UsersComponent,
-    children: [
-      {
-        path: '',
-        component: ListUsersComponent,
-        canActivate: [authGuard, rolesGuard],
-        data: { roles: ['VIEWER', 'ADMIN'] },
-      },
-      {
-        path: 'create',
-        component: CreateUserComponent,
-      },
-      {
-        path: 'edit/:id',
-        component: CreateUserComponent,
-        canActivate: [authGuard, rolesGuard],
-        data: { roles: ['ADMIN'] },
-      },
-    ],
+    loadChildren: () =>
+      import('./modules/users/users.module').then((m) => m.UsersModule),
   },
   {
     path: '**',
