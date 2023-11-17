@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -20,13 +21,15 @@ import {
 } from 'ngx-mask';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { LoginComponent } from './core/auth/components/login/login.component';
 import { NotFoundComponent } from './core/components/not-found/not-found.component';
+import { RequestInterceptor } from './core/interceptors/request.interceptor';
 import { CreateUserComponent } from './modules/users/components/create-user/create-user.component';
 import { ListUsersComponent } from './modules/users/components/list-users/list-users.component';
 import { UsersComponent } from './modules/users/users.component';
 import { HeaderComponent } from './shared/components/header/header.component';
-import { LoginComponent } from './core/auth/components/login/login.component';
-import { RequestInterceptor } from './core/interceptors/request.interceptor';
+import { LoadingComponent } from './shared/components/loading/loading.component';
+import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 
 registerLocaleData(ptBr);
 
@@ -39,6 +42,7 @@ registerLocaleData(ptBr);
     HeaderComponent,
     NotFoundComponent,
     LoginComponent,
+    LoadingComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,11 +60,13 @@ registerLocaleData(ptBr);
     MatInputModule,
     NgxMaskPipe,
     NgxMaskDirective,
+    MatProgressSpinnerModule,
   ],
   providers: [
     provideEnvironmentNgxMask(),
     { provide: LOCALE_ID, useValue: 'pt' },
     { provide: HTTP_INTERCEPTORS, useClass: RequestInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
 })
